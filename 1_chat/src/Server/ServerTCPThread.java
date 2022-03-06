@@ -21,6 +21,7 @@ public class ServerTCPThread implements Runnable {
         this.clientRead = clientRead;
         this.clientWrite = clientWrite;
         this.name = name;
+        System.out.println("Start TCP Server");
     }
 
     @Override

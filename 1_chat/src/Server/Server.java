@@ -4,9 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.sql.SQLOutput;
+import java.net.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -14,14 +12,18 @@ import java.util.concurrent.Executors;
 public class Server {
     private int portNumber;
     private ServerSocket tcpServerSocket;
-    private ExecutorService executorService = Executors.newFixedThreadPool(4);
-    private ConcurrentLinkedQueue<PrintWriter> printWriters = new ConcurrentLinkedQueue<PrintWriter>();
+    private DatagramSocket udpServerSocket;
+    private ExecutorService executorService = Executors.newFixedThreadPool(5);
+    private ConcurrentLinkedQueue<PrintWriter> printWriters = new ConcurrentLinkedQueue<>();
+
+    private ConcurrentLinkedQueue<ClientUDPInfo> UDPClientsInfo = new ConcurrentLinkedQueue<>();
 
     public Server(int portNumber) {
         this.portNumber = portNumber;
     }
 
     public void startServer() throws IOException {
+        this.startUDP();
         tcpServerSocket = new ServerSocket(this.portNumber);
         while (true) {
             Socket clientSocket = null;
@@ -45,9 +47,18 @@ public class Server {
                 System.out.println(name);
                 executorService.execute(new ServerTCPThread(clientSocket, client_read, client_write, this.printWriters, name));
             } else {
-                System.out.println("Coś sie wyjebało");
+                System.out.println("Coś sie oj");
             }
+        }
+    }
 
+    private void startUDP() {
+        try {
+            this.udpServerSocket = new DatagramSocket(this.portNumber);
+            this.executorService.execute(new ServerUDPThread(this.udpServerSocket, this.UDPClientsInfo));
+        } catch (SocketException e) {
+            System.out.println("");
+            e.printStackTrace();
         }
     }
 
@@ -57,6 +68,5 @@ public class Server {
             this.tcpServerSocket.close();
         }
         System.out.println("Server down");
-
     }
 }
