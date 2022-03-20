@@ -1,0 +1,35 @@
+- var playerName = data.playerName;
+- var playerRank = data.playerRank;
+- var playerStatus = data.playerStatus;
+- var friendsList = data.friendsList;
+- var recentPlayerGames = data.recentPlayerGames;
+- var hypixelGames = data.hypixelGames;
+html
+    headhtml
+        head
+            title Render HTML using PUG
+        body
+            h1 Welcome, This is your Hypixel account info!
+        title Render HTML using PUG
+    body(style = {margin: 'auto'})
+        p.
+            Hello! #[br]
+            Your name is: #[strong #{playerName}] and your rank is #[strong #{playerRank}] #[br]
+
+        if playerStatus
+            p You are online right now
+        else
+            p You are offline right now
+        p.
+            Your friends #[br]
+        ul
+            each val in friendsList.length ? friendsList : ['You have no friend']
+                li= val
+        p RecentPlayerGames
+        ul
+            each val in recentPlayerGames.length ? recentPlayerGames : ['Cant find your recent games']
+                li= val
+        p All Hypixel Games
+        ul
+            each val in hypixelGames.length ? hypixelGames : ['Brooooo no games on hypixel?']
+                li= val
